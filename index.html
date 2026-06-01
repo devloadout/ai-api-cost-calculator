@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI API Cost Calculator — Claude, GPT, Gemini Pricing | AI Coder Scope</title>
+<meta name="description" content="Free AI API cost calculator. Estimate and compare what Claude, GPT-4o, Gemini, and DeepSeek cost for your token usage. Editable prices, monthly projections." />
+<meta name="keywords" content="ai api cost calculator, claude api pricing, gpt-4 api cost, llm cost calculator, token cost calculator, openai pricing calculator" />
+<meta property="og:title" content="AI API Cost Calculator — Claude, GPT, Gemini" />
+<meta property="og:description" content="Estimate and compare LLM API costs for your usage. Free, editable prices." />
+<meta property="og:type" content="website" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230D1117'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%233FB950'>%3C%3E</text></svg>" />
+<style>
+  :root{
+    --bg:#0D1117; --panel:#161B22; --border:#222a35; --text:#E6EDF3; --muted:#8B949E;
+    --green:#3FB950; --blue:#58A6FF; --code:#0b0e14;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+  a{color:var(--blue);text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 20px 64px}
+  header{display:flex;align-items:center;gap:12px;padding:8px 0 4px}
+  .logo{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#0D1117,#1E2A44);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--green);font-family:monospace}
+  h1{font-size:30px;margin:18px 0 6px}
+  .sub{color:var(--muted);font-size:17px;margin:0 0 26px;max-width:720px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px}
+  .label{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  .inputs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  @media(max-width:720px){.inputs{grid-template-columns:1fr}}
+  .inputs label{font-size:13px;color:var(--muted);display:block;margin-bottom:5px}
+  .field{width:100%;background:#0e131b;border:1px solid var(--border);color:var(--text);border-radius:9px;padding:10px 11px;font-size:15px}
+  .field:focus{outline:none;border-color:var(--green)}
+  .presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .preset{border:1px solid var(--border);background:#0e131b;color:var(--text);border-radius:8px;padding:6px 11px;cursor:pointer;font-size:13px}
+  .preset:hover{border-color:var(--green)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:right;padding:10px 8px;border-bottom:1px solid var(--border)}
+  th:first-child,td:first-child{text-align:left}
+  th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+  tr.best td{background:rgba(63,185,80,.10)}
+  tr.best td:first-child{color:#b7f7c2;font-weight:700}
+  .price{width:74px;background:#0e131b;border:1px solid var(--border);color:var(--text);border-radius:7px;padding:5px 7px;font-size:13px;text-align:right}
+  .mo{font-weight:700;color:var(--text)}
+  .tag{display:inline-block;background:rgba(63,185,80,.15);color:#b7f7c2;border-radius:6px;padding:1px 7px;font-size:11px;margin-left:6px}
+  .note{color:var(--muted);font-size:12.5px;margin-top:12px}
+  .cta{margin-top:24px;background:linear-gradient(135deg,#10131a,#1b2333);border:1px solid var(--border);border-radius:14px;padding:22px}
+  .cta h3{margin:0 0 8px}.cta p{color:var(--muted);margin:0 0 14px}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .btn{border:none;border-radius:9px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;display:inline-block}
+  .btn.primary{background:var(--green);color:#06210d}
+  .btn.ghost{background:#0e131b;color:var(--text);border:1px solid var(--border)}
+  footer{color:var(--muted);font-size:13px;margin-top:34px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div class="logo">&lt;&gt;</div><strong>AI Coder Scope</strong></header>
+
+  <h1>AI API Cost Calculator</h1>
+  <p class="sub">Estimate and compare what <strong>Claude, GPT, Gemini & DeepSeek</strong> cost for your usage. Enter your tokens per request and volume — see the monthly bill for every model, cheapest first. All prices are editable.</p>
+
+  <div class="card">
+    <p class="label">Your usage</p>
+    <div class="inputs">
+      <div><label>Input tokens / request</label><input class="field" id="tin" type="number" min="0" value="2000" /></div>
+      <div><label>Output tokens / request</label><input class="field" id="tout" type="number" min="0" value="500" /></div>
+      <div><label>Requests / month</label><input class="field" id="req" type="number" min="0" value="10000" /></div>
+    </div>
+    <div class="presets" id="presets"></div>
+  </div>
+
+  <div class="card">
+    <p class="label">Cost comparison (cheapest first)</p>
+    <table>
+      <thead><tr>
+        <th>Model</th><th>$ / 1M in</th><th>$ / 1M out</th><th>Cost / request</th><th>Cost / month</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="note" id="note"></p>
+  </div>
+
+  <div class="cta">
+    <h3>Configure your AI coding agent the right way</h3>
+    <p>Cutting API spend starts with a focused agent that doesn't waste tokens re-reading and re-doing work. Grab battle-tested CLAUDE.md / Cursor configs:</p>
+    <div class="row">
+      <a class="btn primary" href="https://alphaletgo.gumroad.com/l/agentic-coding-kit" target="_blank" rel="noopener">Get the Starter Kit →</a>
+      <a class="btn ghost" href="https://tools.aicoderscope.com" rel="noopener">Free config generator</a>
+      <a class="btn ghost" href="https://github.com/devloadout/awesome-claude-code-configs" target="_blank" rel="noopener">Free templates ★</a>
+    </div>
+  </div>
+
+  <footer>Built by <a href="https://github.com/devloadout" target="_blank" rel="noopener">DevLoadout</a> · Honest AI coding tool reviews at <a href="https://aicoderscope.com" rel="noopener">AICoderScope</a> · Free to use</footer>
+</div>
+
+<script>
+// Default prices (USD per 1M tokens) — approximate, early 2026. EDITABLE in the table.
+const MODELS = [
+  {name:"Claude Opus 4",      in:15,   out:75},
+  {name:"Claude Sonnet 4",    in:3,    out:15},
+  {name:"Claude Haiku 4",     in:0.80, out:4},
+  {name:"GPT-4o",             in:2.5,  out:10},
+  {name:"GPT-4o mini",        in:0.15, out:0.60},
+  {name:"o3 (reasoning)",     in:10,   out:40},
+  {name:"Gemini 2.0 Flash",   in:0.10, out:0.40},
+  {name:"Gemini 1.5 Pro",     in:1.25, out:5},
+  {name:"DeepSeek-V3",        in:0.27, out:1.10}
+];
+const PRESETS = [
+  {label:"Chatbot (short)", tin:500, tout:300, req:30000},
+  {label:"RAG / long context", tin:8000, tout:800, req:5000},
+  {label:"Coding agent", tin:15000, tout:3000, req:2000},
+  {label:"Batch summarize", tin:4000, tout:500, req:50000}
+];
+
+const $=id=>document.getElementById(id);
+function fmt(n){
+  if(n===0) return "$0";
+  if(n<0.01) return "$"+n.toFixed(5);
+  if(n<1) return "$"+n.toFixed(4);
+  return "$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function render(){
+  const tin=+$("tin").value||0, tout=+$("tout").value||0, req=+$("req").value||0;
+  const calc=MODELS.map((m,i)=>{
+    const per=(tin/1e6)*m.in + (tout/1e6)*m.out;
+    return {...m,i,per,mo:per*req};
+  }).sort((a,b)=>a.mo-b.mo);
+
+  const rows=$("rows"); rows.innerHTML="";
+  calc.forEach((m,rank)=>{
+    const tr=document.createElement("tr");
+    if(rank===0) tr.className="best";
+    tr.innerHTML=`
+      <td>${m.name}${rank===0?'<span class="tag">cheapest</span>':''}</td>
+      <td><input class="price" type="number" step="0.01" min="0" data-i="${m.i}" data-k="in" value="${m.in}"></td>
+      <td><input class="price" type="number" step="0.01" min="0" data-i="${m.i}" data-k="out" value="${m.out}"></td>
+      <td>${fmt(m.per)}</td>
+      <td class="mo">${fmt(m.mo)}</td>`;
+    rows.appendChild(tr);
+  });
+  rows.querySelectorAll(".price").forEach(inp=>{
+    inp.onchange=e=>{ MODELS[+e.target.dataset.i][e.target.dataset.k]=+e.target.value||0; render(); };
+  });
+
+  const cheapest=calc[0], dearest=calc[calc.length-1];
+  if(req>0 && dearest.mo>0){
+    const x=(dearest.mo/Math.max(cheapest.mo,1e-9));
+    $("note").textContent=`At ${req.toLocaleString()} requests/month, ${cheapest.name} costs ${fmt(cheapest.mo)}/mo vs ${fmt(dearest.mo)}/mo for ${dearest.name} — a ${x.toFixed(0)}× difference. Prices are editable defaults (early 2026); always verify on the provider's site.`;
+  } else {
+    $("note").textContent="Prices are editable defaults (early 2026); always verify on the provider's pricing page.";
+  }
+}
+
+function presetBtns(){
+  const c=$("presets");
+  PRESETS.forEach(p=>{
+    const b=document.createElement("button");
+    b.className="preset"; b.textContent=p.label;
+    b.onclick=()=>{$("tin").value=p.tin;$("tout").value=p.tout;$("req").value=p.req;render();};
+    c.appendChild(b);
+  });
+}
+
+["tin","tout","req"].forEach(id=>$(id).addEventListener("input",render));
+presetBtns();
+render();
+</script>
+</body>
+</html>
